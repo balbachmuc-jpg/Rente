@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Renten Countdown</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:18px;
+  background:
+    radial-gradient(circle at top left,#ff4fd8 0%,transparent 30%),
+    radial-gradient(circle at bottom right,#6f3dff 0%,transparent 30%),
+    #081224;
+}
+
+.phone{
+  width:100%;
+  max-width:430px;
+}
+
+.card{
+  background:#dce6bf;
+  border-radius:42px;
+  padding:20px 22px 28px;
+  box-shadow:0 16px 45px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+
+.hero{
+  text-align:center;
+  color:#000;
+}
+
+.heroicon{
+  font-size:46px;
+  line-height:1;
+}
+
+.title{
+  margin-top:8px;
+  font-size:23px;
+  line-height:.9;
+  font-weight:900;
+}
+
+.counter{
+  margin-top:10px;
+  font-size:96px;
+  line-height:.85;
+  font-weight:900;
+}
+
+.sub{
+  margin-top:10px;
+  font-size:22px;
+  font-weight:800;
+  line-height:1.15;
+}
+
+.live{
+  margin-top:34px;
+  font-size:20px;
+  line-height:1.4;
+}
+
+.time{
+  margin-top:2px;
+  font-size:25px;
+  font-weight:900;
+}
+
+.progress{
+  margin-top:28px;
+  font-size:24px;
+  font-weight:900;
+}
+
+.trackWrap{
+  position:relative;
+  width:100%;
+  height:860px;
+  margin-top:30px;
+}
+
+svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+
+.road{
+  fill:none;
+  stroke:#1a1b22;
+  stroke-width:24;
+  stroke-linecap:round;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.35));
+}
+
+.middle{
+  fill:none;
+  stroke:#fff;
+  stroke-width:4;
+  stroke-linecap:round;
+  stroke-dasharray:16 14;
+  opacity:.9;
+}
+
+.progressRoad{
+  fill:none;
+  stroke:#58ff96;
+  stroke-width:8;
+  stroke-linecap:round;
+  filter:
+    drop-shadow(0 0 3px #58ff96)
+    drop-shadow(0 0 8px #58ff96);
+  stroke-dasharray:3000;
+  stroke-dashoffset:3000;
+  transition:stroke-dashoffset 1.6s ease;
+}
+
+.runner{
+  position:absolute;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  border:4px solid #58ff96;
+  box-shadow:
+    0 0 10px #58ff96,
+    0 0 18px #58ff96;
+  transform:translate(-50%,-50%);
+  z-index:50;
+}
+
+.flagStart,
+.flagEnd{
+  position:absolute;
+  font-size:38px;
+  z-index:20;
+}
+
+.flagStart{
+  left:8px;
+  bottom:8px;
+}
+
+.flagEnd{
+  right:32px;
+  top:10px;
+}
+
+.milestone{
+  position:absolute;
+  background:#ffd400;
+  border:4px solid #000;
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:12px;
+  font-weight:900;
+  color:#000;
+  z-index:30;
+  box-shadow:0 7px 18px rgba(0,0,0,.25);
+}
+
+.milestone::after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:38px;
+  background:#777;
+  left:50%;
+  top:100%;
+  transform:translateX(-50%);
+  border-radius:6px;
+}
+
+/* Stationen */
+
+.m1{ left:18px;  bottom:18px;  }
+.m2{ right:34px; bottom:120px; }
+.m3{ left:120px; bottom:245px; }
+.m4{ right:28px; bottom:355px; }
+.m5{ left:58px; bottom:470px; }
+.m6{ right:80px; bottom:585px; }
+.m7{ left:90px; bottom:690px; }
+.m8{ right:26px; bottom:780px; }
+.m9{ right:42px; top:18px; }
+
+.footer{
+  margin-top:18px;
+  text-align:center;
+  font-size:17px;
+  line-height:1.4;
+  font-weight:800;
+}
+
+.badge{
+  margin-top:24px;
+  background:linear-gradient(90deg,#ff4fa5,#6d39ff);
+  color:#fff;
+  border-radius:999px;
+  text-align:center;
+  padding:20px;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:0 12px 28px rgba(109,57,255,.35);
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+  <div class="card hero">
+
+    <div class="heroicon">🏖️</div>
+
+    <div class="title">
+      NUR<br>NOCH
+    </div>
+
+    <div class="counter" id="days">135</div>
+
+    <div class="sub">
+      verbleibende<br>Arbeitstage
+    </div>
+
+    <div class="live">
+      und den Rest von heute:
+    </div>
+
+    <div class="time" id="todayRest">
+      00:00:00
+    </div>
+
+    <div class="progress" id="progressText">
+      98.686 % geschafft
+    </div>
+
+    <div class="trackWrap">
+
+      <div class="flagStart">🚩</div>
+      <div class="flagEnd">🏁</div>
+
+      <div class="runner" id="runner"></div>
+
+      <div class="milestone m1">1 RZdBW</div>
+      <div class="milestone m2">2 Rechenzentrale</div>
+      <div class="milestone m3">3 Vereinte</div>
+      <div class="milestone m4">4 Allianz</div>
+      <div class="milestone m5">5 Candle</div>
+      <div class="milestone m6">6 BMC</div>
+      <div class="milestone m7">7 Infosys</div>
+      <div class="milestone m8">8 NTT DATA</div>
+      <div class="milestone m9">9 Deloitte</div>
+
+      <svg viewBox="0 0 390 860">
+
+        <!-- Hauptstraße -->
+        <path
+          id="roadPath"
+          class="road"
+          d="
+          M55 800
+
+          C110 760,180 700,250 640
+
+          S320 520,230 470
+
+          S80 400,120 340
+
+          S250 240,315 180
+
+          S330 90,325 55
+          "
+        />
+
+        <!-- Fortschritt -->
+        <path
+          id="progressPath"
+          class="progressRoad"
+          d="
+          M55 800
+
+          C110 760,180 700,250 640
+
+          S320 520,230 470
+
+          S80 400,120 340
+
+          S250 240,315 180
+
+          S330 90,325 55
+          "
+        />
+
+        <!-- Mittellinie -->
+        <path
+          class="middle"
+          d="
+          M55 800
+
+          C110 760,180 700,250 640
+
+          S320 520,230 470
+
+          S80 400,120 340
+
+          S250 240,315 180
+
+          S330 90,325 55
+          "
+        />
+
+      </svg>
+
+    </div>
+
+    <div class="footer">
+      Seit 01.09.1979 unterwegs<br>
+      Richtung Ruhestand 😎
+    </div>
+
+    <div class="badge" id="badge">
+      Noch 228 Tage
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const careerStart = new Date('1979-09-01');
+const retirementDate = new Date('2026-12-30');
+
+function workdaysRemaining(){
+
+  const end = new Date('2026-12-30');
+
+  const freeDays = new Set([
+    '2026-05-25',
+    '2026-06-04',
+    '2026-12-24',
+    '2026-12-25',
+    '2026-12-31'
+  ]);
+
+  const today = new Date();
+
+  today.setHours(0,0,0,0);
+  end.setHours(0,0,0,0);
+
+  let count = 0;
+
+  const current = new Date(today);
+  current.setDate(current.getDate()+1);
+
+  while(current <= end){
+
+    const day = current.getDay();
+
+    const yyyy = current.getFullYear();
+    const mm = String(current.getMonth()+1).padStart(2,'0');
+    const dd = String(current.getDate()).padStart(2,'0');
+
+    const dateString = `${yyyy}-${mm}-${dd}`;
+
+    const isWeekend =
+      day === 0 || day === 6;
+
+    const isFreeDay =
+      freeDays.has(dateString);
+
+    if(!isWeekend && !isFreeDay){
+      count++;
+    }
+
+    current.setDate(current.getDate()+1);
+  }
+
+  return count;
+}
+
+function calculateCareerProgress(){
+
+  const today = new Date();
+
+  const total =
+    retirementDate - careerStart;
+
+  const done =
+    today - careerStart;
+
+  return Math.max(
+    0,
+    Math.min(100,(done/total)*100)
+  );
+}
+
+function pad(v){
+  return String(v).padStart(2,'0');
+}
+
+function updateTodayRest(){
+
+  const now = new Date();
+
+  const midnight = new Date();
+
+  midnight.setHours(24,0,0,0);
+
+  const diff = midnight - now;
+
+  const h =
+    Math.floor(diff/1000/60/60);
+
+  const m =
+    Math.floor((diff/1000/60)%60);
+
+  const s =
+    Math.floor((diff/1000)%60);
+
+  document.getElementById('todayRest').innerText =
+    pad(h)+':'+pad(m)+':'+pad(s);
+}
+
+function updateTrack(progress){
+
+  const path =
+    document.getElementById('roadPath');
+
+  const progressPath =
+    document.getElementById('progressPath');
+
+  const runner =
+    document.getElementById('runner');
+
+  const length =
+    path.getTotalLength();
+
+  progressPath.style.strokeDasharray =
+    length;
+
+  progressPath.style.strokeDashoffset =
+    length - (length * progress / 100);
+
+  const point =
+    path.getPointAtLength(length * progress / 100);
+
+  runner.style.left =
+    point.x + 'px';
+
+  runner.style.top =
+    point.y + 'px';
+}
+
+function update(){
+
+  const progress =
+    calculateCareerProgress();
+
+  document.getElementById('days').innerText =
+    workdaysRemaining();
+
+  document.getElementById('progressText').innerText =
+    progress.toFixed(3) + ' % geschafft';
+
+  document.getElementById('badge').innerText =
+    'Noch ' +
+    Math.ceil(
+      (retirementDate - new Date())
+      /1000/60/60/24
+    ) +
+    ' Tage';
+
+  updateTodayRest();
+  updateTrack(progress);
+}
+
+update();
+
+setInterval(updateTodayRest,1000);
+
+setInterval(update,60000);
+
+</script>
+
+</body>
+</html>
