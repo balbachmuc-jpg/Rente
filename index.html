@@ -1,0 +1,671 @@
+<!-- v1.0 Ruhestands-Countdown App -->
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<!-- Zeichensatz -->
+<meta charset="UTF-8">
+
+<!-- Mobile Darstellung -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Titel im Browser -->
+<title>Die Uhr läuft</title>
+
+<style>
+
+/* v1.0 Basis Reset */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+/* v1.0 Seitenhintergrund */
+body{
+font-family:Arial,sans-serif;
+background:
+radial-gradient(circle at top left,#ff4fd8 0%,transparent 30%),
+radial-gradient(circle at bottom right,#7c4dff 0%,transparent 30%),
+#081224;
+min-height:100vh;
+display:flex;
+justify-content:center;
+padding:20px;
+}
+
+/* v1.0 Handybreite */
+.phone{
+width:100%;
+max-width:520px;
+margin:auto;
+}
+
+/* v1.0 Hauptkarte */
+.card{
+background:#d8dfbf;
+border-radius:42px;
+padding:24px 24px 30px;
+overflow:hidden;
+position:relative;
+box-shadow:0 18px 55px rgba(0,0,0,.38);
+width:100%;
+}
+
+/* v1.0 Zentrierung */
+.hero{
+text-align:center;
+color:#000;
+}
+
+/* v1.0 Emoji oben */
+.heroicon{
+font-size:48px;
+line-height:1;
+}
+
+/* v1.0 Titel */
+.title{
+font-size:24px;
+line-height:.9;
+font-weight:900;
+margin-top:10px;
+}
+
+/* v1.0 Große Zahl */
+.counter{
+font-size:112px;
+line-height:.82;
+font-weight:900;
+letter-spacing:-4px;
+margin-top:14px;
+}
+
+/* v1.0 Untertitel */
+.sub{
+font-size:22px;
+line-height:1.15;
+font-weight:900;
+margin-top:12px;
+}
+
+/* v1.0 Restzeit */
+.live{
+margin-top:28px;
+font-size:20px;
+line-height:1.4;
+}
+
+/* v1.0 Uhrzeit fett */
+.live strong{
+display:block;
+font-size:28px;
+margin-top:6px;
+}
+
+/* v1.0 Fortschritt */
+.progress{
+margin-top:34px;
+font-size:28px;
+font-weight:900;
+}
+
+/* v1.0 Bereich für Strecke */
+.trackWrap{
+position:relative;
+width:100%;
+max-width:360px;
+height:980px;
+margin:34px auto 0;
+overflow:visible;
+}
+
+/* v1.0 SVG Fläche */
+svg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:980px;
+overflow:visible;
+z-index:1;
+}
+
+/* v1.0 Schwarze Straße */
+.road{
+fill:none;
+stroke:#1c1f27;
+stroke-width:22;
+stroke-linecap:round;
+filter:
+drop-shadow(0 10px 16px rgba(0,0,0,.42));
+}
+
+/* v1.0 Mittellinie */
+.middle{
+fill:none;
+stroke:#ffffff;
+stroke-width:4;
+stroke-linecap:round;
+stroke-dasharray:12 12;
+opacity:.95;
+}
+
+/* v1.0 Grüner Fortschritt */
+.progressRoad{
+fill:none;
+stroke:#5dff95;
+stroke-width:8;
+stroke-linecap:round;
+filter:
+drop-shadow(0 0 4px #5dff95)
+drop-shadow(0 0 12px #5dff95);
+stroke-dasharray:3000;
+stroke-dashoffset:3000;
+transition:stroke-dashoffset 1.5s ease;
+}
+
+/* v1.0 Läufer */
+.runner{
+position:absolute;
+font-size:30px;
+z-index:50;
+transform:translate(-50%,-50%);
+pointer-events:none;
+transition:left 4s ease, top 4s ease;
+filter:
+drop-shadow(0 0 8px white)
+drop-shadow(0 0 16px #5dff95);
+}
+
+/* v1.0 Start/Ziel Flaggen */
+.flagStart,
+.flagEnd{
+position:absolute;
+font-size:38px;
+z-index:20;
+}
+/* v1.1 ZIELFLAGGE TIEFER */
+.flagEnd{
+right:6px;
+top:96px;
+}
+
+/* v1.0 Meilensteine */
+.milestone{
+position:absolute;
+background:#ffd400;
+border:4px solid #000;
+border-radius:999px;
+padding:8px 14px;
+font-size:10px;
+font-weight:900;
+white-space:nowrap;
+color:#000;
+z-index:20;
+box-shadow:
+0 8px 18px rgba(0,0,0,.28);
+}
+
+/* v1.0 Pfosten unter Marker */
+.milestone::after{
+content:"";
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+top:100%;
+width:6px;
+height:42px;
+background:#7b7b7b;
+border-radius:4px;
+}
+
+/* v1.0 Marker Positionen */
+
+/* v1.2 1 RZdBW HÖHER */
+.m1{
+left:18px;
+bottom:103px;
+}
+
+/* v1.2 RECHENZENTRALE HÖHER */
+.m2{
+left:148px;
+bottom:188px;
+}
+
+/* v1.2 STARTFLAGGE */
+.flagStart{
+left:6px;
+bottom:100px;
+}
+
+.m3{
+right:64px;
+bottom:286px;
+}
+
+.m4{
+left:132px;
+bottom:420px;
+}
+
+.m5{
+right:28px;
+bottom:552px;
+}
+
+.m6{
+left:92px;
+bottom:688px;
+}
+
+/* v1.1 7 INFOSYS TIEFER */
+.m7{
+right:18px;
+bottom:738px;
+}
+
+/* v1.1 8 NTT DATA TIEFER */
+.m8{
+left:190px;
+bottom:824px;
+}
+
+/* v1.2 9 DELOITTE HÖHER */
+.m9{
+right:6px;
+top:56px;
+}
+
+/* v1.0 Footer */
+.footer{
+margin-top:12px;
+text-align:center;
+font-size:18px;
+line-height:1.35;
+font-weight:800;
+color:#000;
+}
+
+/* v1.0 Tage Badge */
+.badge{
+margin-top:28px;
+background:linear-gradient(90deg,#ff4fa3,#6b38ff);
+color:#fff;
+border-radius:999px;
+padding:22px;
+text-align:center;
+font-size:22px;
+font-weight:900;
+box-shadow:
+0 12px 24px rgba(124,77,255,.35);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="card hero">
+
+<!-- v1.0 Emoji -->
+<div class="heroicon">🏖️</div>
+
+<!-- v1.0 Titel -->
+<div class="title">
+NUR<br>NOCH
+</div>
+
+<!-- v1.0 Arbeitstage -->
+<div class="counter" id="days">137</div>
+
+<!-- v1.0 Untertext -->
+<div class="sub">
+verbleibende<br>
+Arbeitstage,<br>
+mal sehen, was dann kommt!<br>
+</div>
+
+<!-- v1.0 Rest des Tages -->
+<div class="live">
+und den Rest von heute:
+<strong id="todayRest">23:59:59</strong>
+</div>
+
+<!-- v1.0 Karrierefortschritt -->
+<div class="progress" id="progressText">
+98.686 % geschafft
+</div>
+
+<!-- v1.0 Streckenbereich -->
+<div class="trackWrap">
+
+<!-- v1.0 Start/Ziel -->
+<div class="flagStart">🚩</div>
+<div class="flagEnd">🏁</div>
+
+<!-- v1.0 Läufer -->
+<div class="runner" id="runner">🏃</div>
+
+<!-- v1.0 Firmen -->
+<div class="milestone m1">1 RZdBW</div>
+<div class="milestone m2">2 Rechenzentrale</div>
+<div class="milestone m3">3 Vereinte</div>
+<div class="milestone m4">4 Allianz</div>
+<div class="milestone m5">5 Candle</div>
+<div class="milestone m6">6 BMC</div>
+<div class="milestone m7">7 Infosys</div>
+<div class="milestone m8">8 NTT DATA</div>
+<div class="milestone m9">9 Deloitte</div>
+
+<!-- v1.0 SVG -->
+<svg viewBox="0 0 360 980">
+
+<!-- v1.2 Neue durchgehende Strecke von RZdBW bis Deloitte -->
+
+<!-- v1.2 Hauptstraße -->
+<path
+id="roadPath"
+class="road"
+d="
+M42 930
+
+C78 910,120 900,170 885
+
+S285 845,305 790
+
+S285 720,205 690
+
+S82 645,110 575
+
+S245 520,300 455
+
+S275 390,175 360
+
+S70 315,105 250
+
+S220 205,295 175
+
+S330 120,338 48
+"
+/>
+
+<!-- v1.2 Grüner Fortschritt -->
+<path
+id="progressPath"
+class="progressRoad"
+d="
+M42 930
+
+C78 910,120 900,170 885
+
+S285 845,305 790
+
+S285 720,205 690
+
+S82 645,110 575
+
+S245 520,300 455
+
+S275 390,175 360
+
+S70 315,105 250
+
+S220 205,295 175
+
+S330 120,338 48
+"
+/>
+
+<!-- v1.2 Mittellinie -->
+<path
+class="middle"
+d="
+M42 930
+
+C78 910,120 900,170 885
+
+S285 845,305 790
+
+S285 720,205 690
+
+S82 645,110 575
+
+S245 520,300 455
+
+S275 390,175 360
+
+S70 315,105 250
+
+S220 205,295 175
+
+S330 120,338 48
+"
+/>
+
+</svg>
+
+</div>
+
+<!-- v1.0 Footer -->
+<div class="footer">
+Seit 01.09.1979 unterwegs<br>
+Richtung Ruhestand 😎
+</div>
+
+<!-- v1.0 Badge -->
+<div class="badge" id="badge">
+Noch 228 Tage
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* v1.0 Startdatum */
+const careerStart = new Date('1979-09-01');
+
+/* v1.0 Rentendatum */
+const retirementDate = new Date('2026-12-30');
+
+/* v1.0 Arbeitstage zählen */
+function workdaysRemaining(){
+
+const end = new Date('2026-12-30');
+
+/* v1.0 Freie Tage */
+const freeDays = new Set([
+
+'2026-05-25',
+'2026-06-01',
+'2026-06-02',
+'2026-06-03',
+'2026-06-04',
+'2026-06-05',
+'2026-06-08',
+'2026-06-29',
+
+'2026-08-24',
+'2026-08-25',
+'2026-08-26',
+'2026-08-27',
+'2026-08-28',
+'2026-08-31',
+
+'2026-09-01',
+'2026-09-02',
+'2026-09-03',
+'2026-09-04',
+'2026-09-07',
+'2026-09-08',
+'2026-09-09',
+'2026-09-10',
+'2026-09-11',
+'2026-09-14',
+
+'2026-12-24',
+'2026-12-25',
+'2026-12-28',
+'2026-12-29',
+'2026-12-31'
+
+]);
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+end.setHours(0,0,0,0);
+
+let count = 0;
+
+const current = new Date(today);
+
+current.setDate(current.getDate() + 1);
+
+while(current <= end){
+
+const day = current.getDay();
+
+const yyyy = current.getFullYear();
+const mm = String(current.getMonth()+1).padStart(2,'0');
+const dd = String(current.getDate()).padStart(2,'0');
+
+const dateString = `${yyyy}-${mm}-${dd}`;
+
+const isWeekend =
+day === 0 || day === 6;
+
+const isFreeDay =
+freeDays.has(dateString);
+
+if(!isWeekend && !isFreeDay){
+count++;
+}
+
+current.setDate(current.getDate() + 1);
+}
+
+return count;
+}
+
+/* v1.0 Karrierefortschritt */
+function calculateCareerProgress(){
+
+const today = new Date();
+
+const total =
+retirementDate - careerStart;
+
+const done =
+today - careerStart;
+
+return Math.max(
+0,
+Math.min(100,(done/total)*100)
+);
+
+}
+
+/* v1.0 Zahl auffüllen */
+function pad(v){
+return String(v).padStart(2,'0');
+}
+
+/* v1.0 Restzeit heute */
+function updateTodayRest(){
+
+const now = new Date();
+
+const midnight = new Date();
+midnight.setHours(24,0,0,0);
+
+const diff = midnight - now;
+
+const h = Math.floor(diff / 1000 / 60 / 60);
+const m = Math.floor((diff / 1000 / 60) % 60);
+const s = Math.floor((diff / 1000) % 60);
+
+document.getElementById('todayRest').innerText =
+pad(h)+':'+pad(m)+':'+pad(s);
+
+}
+
+/* v1.0 Fortschritt auf Straße */
+function updateTrack(progress){
+
+const path =
+document.getElementById('roadPath');
+
+const progressPath =
+document.getElementById('progressPath');
+
+const runner =
+document.getElementById('runner');
+
+const length =
+path.getTotalLength();
+
+progressPath.style.strokeDasharray =
+length;
+
+progressPath.style.strokeDashoffset =
+length - (length * progress / 100);
+
+const point =
+path.getPointAtLength(
+length * progress / 100
+);
+
+runner.style.left =
+point.x + 'px';
+
+runner.style.top =
+point.y + 'px';
+
+}
+
+/* v1.0 Alles aktualisieren */
+function update(){
+
+const progress =
+calculateCareerProgress();
+
+document.getElementById('days').innerText =
+workdaysRemaining();
+
+document.getElementById('badge').innerText =
+'Noch ' +
+Math.ceil(
+(retirementDate - new Date())
+/ 1000 / 60 / 60 / 24
+) +
+' Tage';
+
+document.getElementById('progressText').innerText =
+progress.toFixed(3) +
+' % geschafft';
+
+updateTodayRest();
+updateTrack(progress);
+
+}
+
+/* v1.0 Initialstart */
+update();
+
+/* v1.0 Sekundenupdate */
+setInterval(updateTodayRest,1000);
+
+/* v1.0 Minutenupdate */
+setInterval(update,60000);
+
+</script>
+
+</body>
+</html>
